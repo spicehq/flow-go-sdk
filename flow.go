@@ -20,11 +20,8 @@ package flow
 
 import (
 	"encoding/hex"
-	"sync"
 
 	"github.com/ethereum/go-ethereum/rlp"
-
-	"github.com/onflow/flow-go-sdk/crypto"
 )
 
 // An Identifier is a 32-byte unique identifier for an entity.
@@ -64,13 +61,6 @@ func HexToID(h string) Identifier {
 // HashToID constructs an identifier from a 32-byte hash.
 func HashToID(hash []byte) Identifier {
 	return BytesToID(hash)
-}
-
-// BytesToHash constructs a crypto hash from byte slice.
-func BytesToHash(hash []byte) crypto.Hash {
-	h := make(crypto.Hash, len(hash))
-	copy(h, hash)
-	return h
 }
 
 type StateCommitment Identifier
@@ -124,27 +114,6 @@ const (
 
 func (id ChainID) String() string {
 	return string(id)
-}
-
-// entityHasher is a thread-safe hasher used to hash Flow entities.
-type entityHasher struct {
-	mut    sync.Mutex
-	hasher crypto.Hasher
-}
-
-func (h *entityHasher) ComputeHash(b []byte) crypto.Hash {
-	h.mut.Lock()
-	defer h.mut.Unlock()
-	return h.hasher.ComputeHash(b)
-}
-
-// defaultEntityHasher is the default hasher used to compute Flow identifiers.
-var defaultEntityHasher *entityHasher
-
-func init() {
-	defaultEntityHasher = &entityHasher{
-		hasher: crypto.NewSHA3_256(),
-	}
 }
 
 func rlpEncode(v interface{}) ([]byte, error) {

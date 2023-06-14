@@ -27,8 +27,6 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/onflow/cadence"
 	jsoncdc "github.com/onflow/cadence/encoding/json"
-
-	"github.com/onflow/flow-go-sdk/crypto"
 )
 
 // A Transaction is a full transaction object containing a payload and signatures.
@@ -118,11 +116,6 @@ func NewTransaction() *Transaction {
 	return &Transaction{
 		GasLimit: DefaultTransactionGasLimit,
 	}
-}
-
-// ID returns the canonical SHA3-256 hash of this transaction.
-func (t *Transaction) ID() Identifier {
-	return HashToID(defaultEntityHasher.ComputeHash(t.Encode()))
 }
 
 // SetScript sets the Cadence script for this transaction.
@@ -282,46 +275,6 @@ func (t *Transaction) refreshSignerIndex() {
 		}
 		t.EnvelopeSignatures[i].SignerIndex = signerIndex
 	}
-}
-
-// SignPayload signs the transaction payload (TransactionDomainTag + payload)  with the specified account key.
-//
-// The resulting signature is combined with the account address and key index before
-// being added to the transaction.
-//
-// This function returns an error if the signature cannot be generated.
-func (t *Transaction) SignPayload(address Address, keyIndex int, signer crypto.Signer) error {
-	message := t.PayloadMessage()
-	message = append(TransactionDomainTag[:], message...)
-	sig, err := signer.Sign(message)
-	if err != nil {
-		// TODO: wrap error
-		return err
-	}
-
-	t.AddPayloadSignature(address, keyIndex, sig)
-
-	return nil
-}
-
-// SignEnvelope signs the full transaction (TransactionDomainTag + payload + payload signatures) with the specified account key.
-//
-// The resulting signature is combined with the account address and key index before
-// being added to the transaction.
-//
-// This function returns an error if the signature cannot be generated.
-func (t *Transaction) SignEnvelope(address Address, keyIndex int, signer crypto.Signer) error {
-	message := t.EnvelopeMessage()
-	message = append(TransactionDomainTag[:], message...)
-	sig, err := signer.Sign(message)
-	if err != nil {
-		// TODO: wrap error
-		return err
-	}
-
-	t.AddEnvelopeSignature(address, keyIndex, sig)
-
-	return nil
 }
 
 // AddPayloadSignature adds a payload signature to the transaction for the given address and key index.

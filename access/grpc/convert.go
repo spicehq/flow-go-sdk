@@ -30,85 +30,9 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/onflow/flow-go-sdk"
-	"github.com/onflow/flow-go-sdk/crypto"
 )
 
 var errEmptyMessage = errors.New("protobuf message is empty")
-
-func accountToMessage(a flow.Account) *entities.Account {
-	accountKeys := make([]*entities.AccountKey, len(a.Keys))
-	for i, key := range a.Keys {
-		accountKeys[i] = accountKeyToMessage(key)
-	}
-
-	return &entities.Account{
-		Address:   a.Address.Bytes(),
-		Balance:   a.Balance,
-		Code:      a.Code,
-		Keys:      accountKeys,
-		Contracts: a.Contracts,
-	}
-}
-
-func messageToAccount(m *entities.Account) (flow.Account, error) {
-	if m == nil {
-		return flow.Account{}, errEmptyMessage
-	}
-
-	accountKeys := make([]*flow.AccountKey, len(m.GetKeys()))
-	for i, key := range m.GetKeys() {
-		accountKey, err := messageToAccountKey(key)
-		if err != nil {
-			return flow.Account{}, err
-		}
-
-		accountKeys[i] = accountKey
-	}
-
-	return flow.Account{
-		Address:   flow.BytesToAddress(m.GetAddress()),
-		Balance:   m.GetBalance(),
-		Code:      m.GetCode(),
-		Keys:      accountKeys,
-		Contracts: m.GetContracts(),
-	}, nil
-}
-
-func accountKeyToMessage(a *flow.AccountKey) *entities.AccountKey {
-	return &entities.AccountKey{
-		Index:          uint32(a.Index),
-		PublicKey:      a.PublicKey.Encode(),
-		SignAlgo:       uint32(a.SigAlgo),
-		HashAlgo:       uint32(a.HashAlgo),
-		Weight:         uint32(a.Weight),
-		SequenceNumber: uint32(a.SequenceNumber),
-		Revoked:        a.Revoked,
-	}
-}
-
-func messageToAccountKey(m *entities.AccountKey) (*flow.AccountKey, error) {
-	if m == nil {
-		return nil, errEmptyMessage
-	}
-
-	sigAlgo := crypto.SignatureAlgorithm(m.GetSignAlgo())
-	hashAlgo := crypto.HashAlgorithm(m.GetHashAlgo())
-
-	publicKey, err := crypto.DecodePublicKey(sigAlgo, m.GetPublicKey())
-	if err != nil {
-		return nil, err
-	}
-
-	return &flow.AccountKey{
-		Index:          int(m.GetIndex()),
-		PublicKey:      publicKey,
-		SigAlgo:        sigAlgo,
-		HashAlgo:       hashAlgo,
-		Weight:         int(m.GetWeight()),
-		SequenceNumber: uint64(m.GetSequenceNumber()),
-		Revoked:        m.GetRevoked(),
-	}, nil
-}
 
 func blockToMessage(b flow.Block) (*entities.Block, error) {
 

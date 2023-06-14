@@ -114,18 +114,6 @@ func (c *Client) GetTransactionResultsByBlockID(ctx context.Context, blockID flo
 	return c.grpc.GetTransactionResultsByBlockID(ctx, blockID)
 }
 
-func (c *Client) GetAccount(ctx context.Context, address flow.Address) (*flow.Account, error) {
-	return c.grpc.GetAccount(ctx, address)
-}
-
-func (c *Client) GetAccountAtLatestBlock(ctx context.Context, address flow.Address) (*flow.Account, error) {
-	return c.grpc.GetAccountAtLatestBlock(ctx, address)
-}
-
-func (c *Client) GetAccountAtBlockHeight(ctx context.Context, address flow.Address, blockHeight uint64) (*flow.Account, error) {
-	return c.grpc.GetAccountAtBlockHeight(ctx, address, blockHeight)
-}
-
 func (c *Client) ExecuteScriptAtLatestBlock(ctx context.Context, script []byte, arguments []cadence.Value) (cadence.Value, error) {
 	return c.grpc.ExecuteScriptAtLatestBlock(ctx, script, arguments)
 }

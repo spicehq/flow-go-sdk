@@ -19,12 +19,9 @@
 package flow
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/onflow/cadence"
-	"github.com/onflow/flow-go-sdk/crypto"
-	"github.com/onflow/flow-go/crypto/hash"
 )
 
 // List of built-in account event types.
@@ -50,16 +47,6 @@ type Event struct {
 	Value cadence.Event
 	// Bytes representing event data.
 	Payload []byte
-}
-
-// String returns the string representation of this event.
-func (e Event) String() string {
-	return fmt.Sprintf("%s: %s", e.Type, e.ID())
-}
-
-// ID returns the canonical SHA3-256 hash of this event.
-func (e Event) ID() string {
-	return defaultEntityHasher.ComputeHash(e.Encode()).Hex()
 }
 
 // Encode returns the canonical RLP byte representation of this event.
@@ -98,23 +85,6 @@ type BlockEvents struct {
 	Height         uint64
 	BlockTimestamp time.Time
 	Events         []Event
-}
-
-// CalculateEventsHash calculates hash of the events, in a way compatible with the events hash
-// propagated in Chunk. Providing list of events as emitted by transactions in given chunk,
-// hashes should match
-func CalculateEventsHash(es []Event) (crypto.Hash, error) {
-
-	hasher := hash.NewSHA3_256()
-
-	for _, event := range es {
-		_, err := hasher.Write(event.Fingerprint())
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return hasher.SumHash(), nil
 }
 
 // An AccountCreatedEvent is emitted when a transaction creates a new Flow account.

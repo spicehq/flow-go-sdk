@@ -70,15 +70,6 @@ type Client interface {
 	// GetTransactionResultsByBlockID gets all the transaction results for a specified block.
 	GetTransactionResultsByBlockID(ctx context.Context, blockID flow.Identifier) ([]*flow.TransactionResult, error)
 
-	// GetAccount is an alias for GetAccountAtLatestBlock.
-	GetAccount(ctx context.Context, address flow.Address) (*flow.Account, error)
-
-	// GetAccountAtLatestBlock gets an account by address at the latest sealed block.
-	GetAccountAtLatestBlock(ctx context.Context, address flow.Address) (*flow.Account, error)
-
-	// GetAccountAtBlockHeight gets an account by address at the given block height
-	GetAccountAtBlockHeight(ctx context.Context, address flow.Address, blockHeight uint64) (*flow.Account, error)
-
 	// ExecuteScriptAtLatestBlock executes a read-only Cadence script against the latest sealed execution state.
 	ExecuteScriptAtLatestBlock(ctx context.Context, script []byte, arguments []cadence.Value) (cadence.Value, error)
 

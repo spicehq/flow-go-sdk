@@ -277,24 +277,6 @@ func (c *BaseClient) GetTransactionResult(
 	return toTransactionResult(tx.Result, c.jsonOptions)
 }
 
-func (c *BaseClient) GetAccountAtBlockHeight(
-	ctx context.Context,
-	address flow.Address,
-	blockQuery HeightQuery,
-	opts ...queryOpts,
-) (*flow.Account, error) {
-	if !blockQuery.singleHeightDefined() {
-		return nil, fmt.Errorf("can only provide one block height at a time")
-	}
-
-	account, err := c.handler.getAccount(ctx, address.String(), blockQuery.heightsString(), opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	return toAccount(account)
-}
-
 func (c *BaseClient) ExecuteScriptAtBlockID(
 	ctx context.Context,
 	blockID flow.Identifier,

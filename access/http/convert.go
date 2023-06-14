@@ -23,7 +23,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/onflow/cadence"
 	cadenceJSON "github.com/onflow/cadence/encoding/json"
@@ -31,32 +30,10 @@ import (
 
 	"github.com/onflow/flow-go-sdk"
 	"github.com/onflow/flow-go-sdk/access/http/models"
-	"github.com/onflow/flow-go-sdk/crypto"
 )
 
 func toAddress(address string) flow.Address {
 	return flow.HexToAddress(address)
-}
-
-func toKeys(keys []models.AccountPublicKey) []*flow.AccountKey {
-	accountKeys := make([]*flow.AccountKey, len(keys))
-
-	for i, key := range keys {
-		sigAlgo := crypto.StringToSignatureAlgorithm(string(*key.SigningAlgorithm))
-		pkey, _ := crypto.DecodePublicKeyHex(sigAlgo, strings.TrimPrefix(key.PublicKey, "0x")) // validation is done on AN
-
-		accountKeys[i] = &flow.AccountKey{
-			Index:          mustToInt(key.Index),
-			PublicKey:      pkey,
-			SigAlgo:        sigAlgo,
-			HashAlgo:       crypto.StringToHashAlgorithm(string(*key.HashingAlgorithm)),
-			Weight:         mustToInt(key.Weight),
-			SequenceNumber: mustToUint(key.SequenceNumber),
-			Revoked:        key.Revoked,
-		}
-	}
-
-	return accountKeys
 }
 
 func toContracts(contracts map[string]string) (map[string][]byte, error) {
@@ -71,20 +48,6 @@ func toContracts(contracts map[string]string) (map[string][]byte, error) {
 	}
 
 	return decoded, nil
-}
-
-func toAccount(account *models.Account) (*flow.Account, error) {
-	contracts, err := toContracts(account.Contracts)
-	if err != nil {
-		return nil, err
-	}
-
-	return &flow.Account{
-		Address:   toAddress(account.Address),
-		Balance:   mustToUint(account.Balance),
-		Keys:      toKeys(account.Keys),
-		Contracts: contracts,
-	}, nil
 }
 
 func toBlockHeader(header *models.BlockHeader, blockStatus string) *flow.BlockHeader {
@@ -424,7 +387,6 @@ func toExecutionResults(result models.ExecutionResult) *flow.ExecutionResult {
 		chunks[i] = &flow.Chunk{
 			CollectionIndex:      uint(mustToUint(chunk.CollectionIndex)),
 			StartState:           flow.HexToStateCommitment(chunk.StartState),
-			EventCollection:      crypto.Hash(chunk.EventCollection),
 			BlockID:              flow.HexToID(chunk.BlockId),
 			TotalComputationUsed: mustToUint(chunk.TotalComputationUsed),
 			NumberOfTransactions: uint16(mustToUint(chunk.NumberOfTransactions)),

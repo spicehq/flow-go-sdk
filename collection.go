@@ -23,11 +23,6 @@ type Collection struct {
 	TransactionIDs []Identifier
 }
 
-// ID returns the canonical SHA3-256 hash of this collection.
-func (c Collection) ID() Identifier {
-	return HashToID(defaultEntityHasher.ComputeHash(c.Encode()))
-}
-
 // Encode returns the canonical RLP byte representation of this collection.
 func (c Collection) Encode() []byte {
 	transactionIDs := make([][]byte, len(c.TransactionIDs))

@@ -348,56 +348,6 @@ func (c *BaseClient) GetTransactionResultsByBlockID(
 	return results, nil
 }
 
-func (c *BaseClient) GetAccount(ctx context.Context, address flow.Address, opts ...grpc.CallOption) (*flow.Account, error) {
-	return c.GetAccountAtLatestBlock(ctx, address, opts...)
-}
-
-func (c *BaseClient) GetAccountAtLatestBlock(
-	ctx context.Context,
-	address flow.Address,
-	opts ...grpc.CallOption,
-) (*flow.Account, error) {
-	req := &access.GetAccountAtLatestBlockRequest{
-		Address: address.Bytes(),
-	}
-
-	res, err := c.rpcClient.GetAccountAtLatestBlock(ctx, req, opts...)
-	if err != nil {
-		return nil, newRPCError(err)
-	}
-
-	account, err := messageToAccount(res.GetAccount())
-	if err != nil {
-		return nil, newMessageToEntityError(entityAccount, err)
-	}
-
-	return &account, nil
-}
-
-func (c *BaseClient) GetAccountAtBlockHeight(
-	ctx context.Context,
-	address flow.Address,
-	blockHeight uint64,
-	opts ...grpc.CallOption,
-) (*flow.Account, error) {
-	req := &access.GetAccountAtBlockHeightRequest{
-		Address:     address.Bytes(),
-		BlockHeight: blockHeight,
-	}
-
-	res, err := c.rpcClient.GetAccountAtBlockHeight(ctx, req, opts...)
-	if err != nil {
-		return nil, newRPCError(err)
-	}
-
-	account, err := messageToAccount(res.GetAccount())
-	if err != nil {
-		return nil, newMessageToEntityError(entityAccount, err)
-	}
-
-	return &account, nil
-}
-
 func (c *BaseClient) ExecuteScriptAtLatestBlock(
 	ctx context.Context,
 	script []byte,
@@ -588,7 +538,6 @@ func (c *BaseClient) GetExecutionResultForBlockID(ctx context.Context, blockID f
 		chunks[i] = &flow.Chunk{
 			CollectionIndex:      uint(chunk.CollectionIndex),
 			StartState:           flow.BytesToStateCommitment(chunk.StartState),
-			EventCollection:      flow.BytesToHash(chunk.EventCollection),
 			BlockID:              flow.BytesToID(chunk.BlockId),
 			TotalComputationUsed: chunk.TotalComputationUsed,
 			NumberOfTransactions: uint16(chunk.NumberOfTransactions),

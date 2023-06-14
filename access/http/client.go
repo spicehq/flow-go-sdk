@@ -133,30 +133,6 @@ func (c *Client) GetTransactionResultsByBlockID(ctx context.Context, blockID flo
 	return nil, fmt.Errorf("not implemented")
 }
 
-// GetAccount is an alias for GetAccountAtLatestBlock.
-func (c *Client) GetAccount(ctx context.Context, address flow.Address) (*flow.Account, error) {
-	return c.GetAccountAtLatestBlock(ctx, address)
-}
-
-func (c *Client) GetAccountAtLatestBlock(ctx context.Context, address flow.Address) (*flow.Account, error) {
-	return c.httpClient.GetAccountAtBlockHeight(
-		ctx,
-		address, HeightQuery{Heights: []uint64{SEALED}},
-	)
-}
-
-func (c *Client) GetAccountAtBlockHeight(
-	ctx context.Context,
-	address flow.Address,
-	blockHeight uint64,
-) (*flow.Account, error) {
-	return c.httpClient.GetAccountAtBlockHeight(
-		ctx,
-		address,
-		HeightQuery{Heights: []uint64{blockHeight}},
-	)
-}
-
 func (c *Client) ExecuteScriptAtLatestBlock(
 	ctx context.Context,
 	script []byte,
